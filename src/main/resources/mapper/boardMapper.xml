@@ -1,0 +1,81 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.myspring.jin.dao.BoardMapper">
+    <select id="selectPage" parameterType="map" resultType="BoardDto">
+        SELECT bno, title, content, writer, view_cnt, comment_cnt, reg_date
+        FROM board
+        ORDER BY reg_date DESC, bno DESC
+        LIMIT #{offset}, #{pageSize}
+    </select>
+
+    <select id="count" resultType="int">
+        SELECT count(*) FROM board;
+    </select>
+
+    <select id="read" parameterType="int" resultType="BoardDto">
+        SELECT bno, title, content, writer, view_cnt, comment_cnt, reg_date
+        FROM board WHERE bno = ${bno}
+    </select>
+
+    <select id="view_cnt" parameterType="int">
+        UPDATE board
+        SET View_cnt = View_cnt +1
+        where bno = #{bno}
+    </select>
+
+    <select id="write" parameterType="BoardDto">
+        INSERT INTO board
+        (title, content, writer)
+        VALUES
+        (#{title}, #{content}, #{writer})
+    </select>
+
+    <select id="delete" parameterType="map">
+        delete from board
+        where bno = #{bno} and writer = #{writer}
+    </select>
+
+    <select id="update" parameterType="BoardDto">
+        UPDATE board
+        SET title = #{title}, content = #{content}, up_date = now()
+        where bno = #{bno} and writer = #{writer}
+    </select>
+
+
+    <!-- 검색 -->
+
+    <sql id="searchCondition">
+        <choose>
+            <when test='option=="T"'>
+                AND title LIKE concat('%', #{keyword}, '%')
+            </when>
+            <when test='option=="W"'>
+                AND writer LIKE concat('%', #{keyword}, '%')
+            </when>
+            <otherwise>
+                AND (title LIKE concat('%', #{keyword}, '%')
+                OR content LIKE concat('%', #{keyword}, '%'))
+            </otherwise>
+        </choose>
+    </sql>
+
+    <select id="searchSelectPage" parameterType="SearchCondition" resultType="BoardDto">
+        SELECT bno, title, content, writer, view_cnt, comment_cnt, reg_date
+        FROM board
+        WHERE true
+          <include refid="searchCondition"/>
+        ORDER BY reg_date DESC, bno DESC
+            LIMIT #{offset}, #{pageSize}
+    </select>
+
+
+    <select id="searchResultCnt" parameterType="SearchCondition" resultType="int">
+        SELECT count(*)
+        FROM board
+        WHERE true
+        <include refid="searchCondition"/>
+    </select>
+
+</mapper>

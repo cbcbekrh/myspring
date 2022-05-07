@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<!DOCTYPE mapper PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+
+<mapper namespace="com.myspring.jin.dao.UserMapper">
+    <insert id="insert" parameterType="UserDto">
+        INSERT INTO user
+            (id, pwd, name, email)
+        VALUES
+            (#{id}, #{pwd}, #{name}, #{email})
+    </insert>
+
+    <select id="select" parameterType="String" resultType="UserDto">
+        SELECT id, pwd, name, email FROM user
+        WHERE id = #{id}
+    </select>
+
+    <!-- 비번찾기 -->
+    <select id="look" parameterType="map" resultType="String">
+        SELECT pwd from user
+        WHERE id = #{id} and email = #{email}
+    </select>
+</mapper>
